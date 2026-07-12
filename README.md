@@ -2,6 +2,8 @@
 
 Windows screenshot + note tool for Claude Code workflows. Global hotkey → region snip → note → paired `snap_*.png` / `snap_*.txt` in a target folder.
 
+![Screenie](docs/screenie.png)
+
 ## Usage
 
 - `F5` — drag to capture. Saves immediately, also copied to clipboard.
