@@ -16,6 +16,8 @@ namespace ScreenieApp
     {
         [DllImport("user32.dll")]
         static extern bool SetProcessDPIAware();
+        [DllImport("user32.dll")]
+        static extern bool SetProcessDpiAwarenessContext(IntPtr ctx);
         [DllImport("user32.dll", CharSet = CharSet.Unicode)]
         public static extern int RegisterWindowMessage(string name);
         [DllImport("user32.dll")]
@@ -24,10 +26,22 @@ namespace ScreenieApp
         // broadcast by a second launch so the running instance opens its window
         public static readonly int WM_SHOWME = RegisterWindowMessage("Screenie_ShowMe");
 
+        // per-monitor v2 so captures aren't scaled/mis-cropped on mixed-DPI monitor setups;
+        // system-DPI-aware fallback for pre-1703 Windows
+        static void SetDpiAwareness()
+        {
+            try
+            {
+                if (SetProcessDpiAwarenessContext(new IntPtr(-4))) return; // DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2
+            }
+            catch (EntryPointNotFoundException) { }
+            SetProcessDPIAware();
+        }
+
         [STAThread]
         static void Main(string[] args)
         {
-            SetProcessDPIAware();
+            SetDpiAwareness();
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             bool trayStart = false;
